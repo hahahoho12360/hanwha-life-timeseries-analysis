@@ -133,7 +133,7 @@ python analysis.py --source sample --start 2015-01-01 --end 2026-08-31
 python -m unittest discover -s tests -v
 ```
 
-다섯 항목 모두 `ok`이고 마지막에 `OK`가 나오면 정상이다.
+일곱 항목 모두 `ok`이고 마지막에 `OK`가 나오면 정상이다.
 
 > `sample` 보고서의 숫자와 결론은 제출하면 안 된다. 이 단계의 목적은 설치·코드·그래프 저장이 정상인지 확인하는 것이다.
 
@@ -144,6 +144,8 @@ python -m unittest discover -s tests -v
 ```powershell
 python analysis.py --source live --start 2015-01-01 --end 2026-08-31
 ```
+
+이 명령을 다시 실행해도 `REPORT.md`의 실제 GitHub·Streamlit 주소는 기본값으로 보존된다. 주소가 바뀐 경우에만 `--github-url 새주소 --dashboard-url 새주소`를 뒤에 붙인다.
 
 현재 시점의 직전 완료 월까지 자동으로 분석하려면 `--end`를 빼도 된다.
 
@@ -186,19 +188,21 @@ date,close
 
 ### 6-2. 한화생명 분기 영업이익
 
-`data/manual/hanwha_operating_profit.csv`를 아래 모양으로 채운다.
+현재 `data/manual/hanwha_operating_profit.csv`에는 DART 연결 포괄손익계산서로 검증한 2025년 2분기~2026년 2분기 값이 들어 있다. 이후 분기를 추가하거나 값을 교체할 때 아래 모양을 지킨다.
 
 ```csv
-quarter,operating_profit_krw_100m,source_url
-2015Q1,1000,https://근거문서주소
-2015Q2,1200,https://근거문서주소
+quarter,operating_profit_krw_100m,source_url,derivation
+2026Q1,4807.82,https://dart.fss.or.kr/공시주소,반기 누적액에서 2분기 단독액 차감 후 억원으로 변환
+2026Q2,6267.82,https://dart.fss.or.kr/공시주소,3개월 영업이익을 억원으로 변환
 ```
 
 - `quarter`: `연도Q분기` 형식
 - `operating_profit_krw_100m`: **억 원** 단위
 - `source_url`: 한화생명 IR 또는 DART 원문 주소
+- `derivation`: 공시의 직접 3개월 값인지, 누적액끼리 차감한 값인지와 단위 변환식을 기록
 - 반기·3분기 공시의 누적액과 해당 분기 단독액을 혼동하지 않는다.
 - 2023년 IFRS 17 도입 전후에는 회계기준 변화 때문에 단순 비교를 조심한다.
+- 공식 검증 CSV가 비어 있으면 코드는 영업이익 보조 분석을 제외하며, 비공식 자동 스냅샷으로 조용히 대체하지 않는다.
 
 저장한 뒤 5장의 실제 자료 명령을 다시 실행한다.
 
@@ -210,6 +214,7 @@ quarter,operating_profit_krw_100m,source_url
 2. 미래 값을 과거에 넣는 보간은 하지 않는다.
 3. 핵심 변수 중 하나라도 없는 달은 핵심 분석에서 제외한다.
 4. 제외 전후 행 수와 변수별 결측 수를 `outputs/data_quality_profile.csv`에 남긴다.
+5. 12개월 이동통계의 첫 11개 결측은 창이 채워지기 전의 **구조적 준비구간 결측**이므로 오류로 보간하거나 삭제하지 않는다. 100개 이상 완전관측치 판정은 핵심 6개 변수에 적용한다.
 
 이 기준은 존재하지 않는 금융자료를 임의로 만들어 상관관계를 왜곡하지 않기 위해서다.
 
@@ -283,7 +288,7 @@ GitHub 화면에서 다음이 실제로 보이는지 확인한다.
 - `analysis.py`, `dashboard.py`, `requirements.txt`, `requirements-lock.txt`
 - `README.md`, `REPORT.md`, `DATA_SOURCES.md`
 - `data/processed/monthly_analysis.csv`
-- `outputs/forecast.csv`, `outputs/metrics.json`, `outputs/figures/*.png`
+- `outputs/source_manifest.json`, `outputs/forecast.csv`, `outputs/metrics.json`, `outputs/figures/*.png`
 - `tests/test_analysis.py`
 
 ## 12. 보너스 과제 A — Streamlit 공개 URL 만들기
@@ -327,6 +332,7 @@ data/raw/                           실행 때 내려받은 원자료
 data/manual/                        수동 입력 템플릿
 data/processed/monthly_analysis.csv 월별 최종 분석표
 outputs/data_quality_profile.csv    결측·이상치 점검표
+outputs/source_manifest.json        실제 사용 출처·대체경로 공개 명세
 outputs/cross_check_points.csv      원자료 수준값 3개 시점 재계산 검산표
 outputs/metric_cross_check.csv      REPORT·JSON 핵심 수치 교차검산표
 outputs/metrics.json                핵심 숫자와 예측 성능
@@ -366,7 +372,7 @@ tests/test_analysis.py              자동검사
 4. **재현 자료**
    - `requirements.txt`, 가능하면 `requirements-lock.txt`
    - `README.md` 실행 방법
-   - `DATA_SOURCES.md` 출처·수집·라이선스
+   - `DATA_SOURCES.md` 출처·수집·라이선스와 `outputs/source_manifest.json` 실제 사용 출처 명세
    - `data/processed/monthly_analysis.csv`
 
 5. **제출 링크 2개**
@@ -383,7 +389,7 @@ tests/test_analysis.py              자동검사
 - [x] 월별 완전 관측치가 100개 이상이다.
 - [x] 그래프가 3개 이상 열리고 숫자가 서로 모순되지 않는다.
 - [x] `REPORT.md`의 숫자 3개를 CSV나 `metrics.json`으로 직접 다시 계산했다.
-- [x] GitHub 공개 URL에서 저장소와 29개 파일을 확인했다.
+- [x] GitHub 공개 URL에서 저장소와 30개 파일을 확인했다.
 - [x] Streamlit 공개 URL에서 140개 관측치·필터·그래프·예측·CSV 다운로드 영역을 확인했다.
 - [x] `.env`, KRX 아이디·비밀번호, 개인 API 키가 GitHub에 없다.
 - [x] 표와 문장에 ‘원인’이라고 단정하지 않고 ‘동행·상관·가능성’으로 썼다.
@@ -484,4 +490,4 @@ python -m pip install -r requirements.txt
 - GitHub 저장소 URL: <https://github.com/hahahoho12360/hanwha-life-timeseries-analysis>
 - 공개 대시보드 URL: <https://hanwha-life-timeseries-analysis-3kcrxnzdhpt9e9e9jb8ckm.streamlit.app/>
 
-두 주소를 입력한 뒤 `REPORT.md`에도 똑같이 기록하고 마지막 커밋을 한다.
+두 주소는 `analysis.py`의 기본값과 `REPORT.md`에도 동일하게 기록되어 있어 재실행해도 유지된다. 주소가 바뀌면 실행 옵션과 README를 함께 갱신한다.

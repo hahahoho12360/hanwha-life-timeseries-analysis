@@ -48,6 +48,10 @@ MANUAL_DIR = PROJECT_ROOT / "data" / "manual"
 PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
 OUTPUT_DIR = PROJECT_ROOT / "outputs"
 FIGURE_DIR = OUTPUT_DIR / "figures"
+DEFAULT_GITHUB_URL = "https://github.com/hahahoho12360/hanwha-life-timeseries-analysis"
+DEFAULT_DASHBOARD_URL = (
+    "https://hanwha-life-timeseries-analysis-3kcrxnzdhpt9e9e9jb8ckm.streamlit.app/"
+)
 
 
 @dataclass(frozen=True)
@@ -58,11 +62,38 @@ class Config:
     rolling_window: int = 12
     forecast_horizon: int = 3
     minimum_points: int = 100
+    github_url: str = DEFAULT_GITHUB_URL
+    dashboard_url: str = DEFAULT_DASHBOARD_URL
 
 
 def ensure_directories() -> None:
     for path in (RAW_DIR, MANUAL_DIR, PROCESSED_DIR, OUTPUT_DIR, FIGURE_DIR):
         path.mkdir(parents=True, exist_ok=True)
+
+
+def write_source_manifests(source_manifest: list[dict[str, str]], config: Config) -> None:
+    """원자료 경로와 실제 대체경로를 로컬·공개 명세에 함께 기록한다.
+
+    ``data/raw``는 재배포 주의 때문에 Git에서 제외한다. 따라서 같은 명세를
+    비밀정보 없이 ``outputs/source_manifest.json``에도 저장해 평가자가 실제로
+    사용된 계열과 대체경로를 저장소에서 확인할 수 있게 한다.
+    """
+    payload = {
+        "source_mode": config.source,
+        "analysis_period": {
+            "requested_start": config.start.strftime("%Y-%m-%d"),
+            "requested_end": config.end.strftime("%Y-%m-%d"),
+        },
+        "generated_at_utc": pd.Timestamp.now(tz="UTC").floor("s").isoformat(),
+        "raw_data_policy": (
+            "data/raw is generated locally and excluded from Git; this public manifest "
+            "contains only source metadata and no credentials."
+        ),
+        "sources": source_manifest,
+    }
+    serialized = json.dumps(payload, ensure_ascii=False, indent=2)
+    (RAW_DIR / "source_manifest.json").write_text(serialized, encoding="utf-8")
+    (OUTPUT_DIR / "source_manifest.json").write_text(serialized, encoding="utf-8")
 
 
 def last_complete_month_end(today: date | None = None) -> pd.Timestamp:
@@ -456,24 +487,27 @@ def collect_live_data(config: Config) -> tuple[pd.DataFrame, pd.DataFrame, list[
     gdp_level = quarter_end(gdp_level).rename("real_gdp_level")
     save_raw_series(gdp_level, "fred_korea_real_gdp_quarterly.csv", "real_gdp_level")
 
-    print("[6/7] 한화생명 분기 영업이익 수집 또는 수동자료 확인")
+    print("[6/7] 한화생명 분기 영업이익 공식 검증자료 확인")
     operating_profit = load_manual_operating_profit()
     if operating_profit is None:
-        try:
-            finstate = fdr.SnapDataReader("NAVER/FINSTATE-2Q/088350")
-            finstate.to_csv(RAW_DIR / "naver_hanwha_finstate_quarterly.csv", encoding="utf-8-sig")
-            operating_profit = parse_finstate_operating_profit(finstate, end=config.end)
-            messages.append(
-                "영업이익은 네이버 분기 연결 재무제표 스냅샷을 사용했습니다. "
-                "제출 전 한화생명 IR/공시 원문과 표본 대조가 필요합니다."
-            )
-        except Exception as exc:
-            operating_profit = pd.Series(dtype=float, name="operating_profit_krw_100m")
-            messages.append(
-                "분기 영업이익 자동 수집을 건너뛰었습니다. "
-                "data/manual/hanwha_operating_profit.csv를 채우면 보조 분석에 포함됩니다. "
-                f"원인: {type(exc).__name__}"
-            )
+        operating_profit = pd.Series(dtype=float, name="operating_profit_krw_100m")
+        operating_profit_access = "공식 검증 CSV 미제공: 보조 분석에서 제외"
+        operating_profit_url = "https://dart.fss.or.kr/"
+        messages.append(
+            "공식 출처로 검증된 분기 영업이익 CSV가 비어 있어 보조 분석에서 제외했습니다. "
+            "오해 가능성이 있는 비공식 자동 스냅샷으로 대체하지 않습니다."
+        )
+    else:
+        operating_profit = operating_profit.loc[operating_profit.index <= config.end]
+        operating_profit_access = "수동 검증 CSV(DART 연결 포괄손익계산서)"
+        operating_profit_url = (
+            "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260831001232"
+        )
+        messages.append(
+            "한화생명 분기 영업이익은 DART 연결 포괄손익계산서로 검증한 "
+            f"{len(operating_profit)}개 분기 CSV를 사용했습니다. 직접값과 누적액 차감식은 "
+            "data/manual/hanwha_operating_profit.csv에 기록했습니다."
+        )
 
     source_manifest.extend(
         [
@@ -487,15 +521,13 @@ def collect_live_data(config: Config) -> tuple[pd.DataFrame, pd.DataFrame, list[
             {
                 "variable": "operating_profit_krw_100m",
                 "series": "한화생명 분기 영업이익(보조)",
-                "access": "수동 공식자료 우선, 없으면 NAVER/FINSTATE-2Q/088350",
-                "url": "https://www.hanwhalife.com/company/ir/main/main.do",
-                "raw_file": "data/raw/naver_hanwha_finstate_quarterly.csv",
+                "access": operating_profit_access,
+                "url": operating_profit_url,
+                "raw_file": "data/manual/hanwha_operating_profit.csv",
             },
         ]
     )
-    (RAW_DIR / "source_manifest.json").write_text(
-        json.dumps(source_manifest, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    write_source_manifests(source_manifest, config)
 
     quarterly_aux = pd.concat(
         [gdp_level, operating_profit.rename("operating_profit_krw_100m")], axis=1
@@ -986,11 +1018,22 @@ def build_report(
         qcorr = quarterly[available].corr() if len(available) >= 2 else pd.DataFrame()
         op_level_count = int(quarterly.get("operating_profit_krw_100m", pd.Series(dtype=float)).notna().sum())
         op_yoy_count = int(quarterly.get("operating_profit_yoy_pct", pd.Series(dtype=float)).notna().sum())
+        if config.source == "live" and op_level_count:
+            operating_profit_note = (
+                "영업이익은 DART 연결 포괄손익계산서의 3개월 값 또는 누적액 차감식으로 "
+                f"검증한 최근 {op_level_count}개 분기다. "
+            )
+        elif config.source == "live":
+            operating_profit_note = "공식 검증 영업이익이 없어 이 변수는 제외했다. "
+        else:
+            operating_profit_note = (
+                f"연습용 가상 영업이익은 {op_level_count}개 분기이며 제출용 수치가 아니다. "
+            )
         quarterly_text = (
             "### 보조 분기 분석\n\n"
             "분기 영업이익은 2023년 IFRS 17 도입 전후의 회계기준 변화 영향을 받을 수 있으므로 "
             "월별 핵심모형과 분리했다. GDP는 계절조정 실질 GDP 수준에서 전기 대비 성장률을 계산했다. "
-            f"자동 수집된 영업이익 실제값은 최근 {op_level_count}개 분기이고 전년동기 증가율은 "
+            f"{operating_profit_note}전년동기 증가율은 "
             f"{op_yoy_count}개만 계산되어, 영업이익 상관계수는 표본 부족으로 제시하지 않는다.\n\n"
             + (markdown_table(qcorr) if not qcorr.empty else "비교 가능한 분기값이 충분하지 않다.")
         )
@@ -1047,6 +1090,7 @@ def build_report(
 
 - 결측치는 값이 없는 달을 숫자로 꾸며내지 않기 위해 보간하지 않았다. 서로 다른 출처를 월말축으로 맞춘 뒤 핵심 변수 중 하나라도 없는 달만 제외했다.
 - 첫 달의 수익률·차분은 이전 달이 없어서 계산할 수 없으므로 제외했다.
+- 12개월 이동평균·이동변동성·이동상관의 첫 11개월 결측은 12개 월 창이 아직 채워지지 않아 생기는 **구조적 준비구간 결측**이다. 오류나 원자료 누락이 아니므로 보간·삭제하지 않았고, {len(monthly)}개 완전관측치 판정은 핵심 6개 변수에만 적용했다.
 - 이상치는 중앙값 절대편차(MAD) 기준 robust z-score 절댓값 3.5 초과로 **표시만** 했다. 금융위기·코로나 같은 실제 충격일 수 있어 본 분석에서는 삭제하지 않았다.
 - 이상치 제거 여부가 결론을 바꾸는지는 후속 민감도 분석 대상으로 남겼다.
 
@@ -1135,7 +1179,7 @@ def build_report(
 | 수집·정제·그래프·예측 코드 작성 보조 | 반복 코드를 줄이기 위해 | sample 모드 전체 실행, 행 수·날짜·단위 assert, 원자료 첫/끝 5행 대조 |
 | 인사이트 문장 초안 | 관찰·가설·행동을 분리하기 위해 | REPORT 숫자를 processed CSV로 재계산하고, 인과 표현을 상관 표현으로 교정 |
 
-AI 없이 핵심 결론을 재구성하려면 `data/raw` → `data/processed/monthly_analysis.csv` → `outputs/metrics.json` → 그래프 순서로 확인한다. 상관계수는 pandas `corr()`, 수익률은 `pct_change()*100`, 금리변화는 `diff()`로 직접 재계산할 수 있다.
+AI 없이 핵심 결론을 재구성하려면 먼저 `outputs/source_manifest.json`에서 실제 사용 출처와 대체경로를 확인한다. 그다음 `python analysis.py --source live ...`로 Git에서 제외된 `data/raw`를 다시 만들고, `data/raw` → `data/processed/monthly_analysis.csv` → `outputs/metrics.json` → 그래프 순서로 확인한다. 상관계수는 pandas `corr()`, 수익률은 `pct_change()*100`, 금리변화는 `diff()`로 직접 재계산할 수 있다.
 
 ## 11. 데이터 출처·수집 경고
 
@@ -1149,11 +1193,11 @@ AI 없이 핵심 결론을 재구성하려면 `data/raw` → `data/processed/mon
 
 ## 13. 제출 링크
 
-- GitHub 저장소 URL: `<업로드 후 실제 주소 입력>`
-- 공개 웹 대시보드 URL: `<Streamlit 배포 후 실제 주소 입력>`
+- GitHub 저장소 URL: <{config.github_url}>
+- 공개 웹 대시보드 URL: <{config.dashboard_url}>
 
-두 주소는 로그아웃 또는 시크릿 브라우저에서도 열리는지 확인한다. 이 절은 `analysis.py`를 다시
-실행하면 기본 문구로 덮어써지므로, **최종 실자료 분석을 끝낸 다음 마지막에 주소를 입력한다.**
+두 주소는 로그아웃 또는 시크릿 브라우저에서도 열리는지 확인한다. 기본값은 현재 공개 주소이며,
+저장소나 앱 주소가 바뀌면 `--github-url`과 `--dashboard-url` 옵션으로 안전하게 갱신할 수 있다.
 """
     report_path = PROJECT_ROOT / "REPORT.md"
     report_path.write_text(report, encoding="utf-8")
@@ -1402,6 +1446,8 @@ def validate_outputs(monthly: pd.DataFrame, figure_paths: list[str], config: Con
     assert (PROCESSED_DIR / "monthly_analysis.csv").exists(), "정제 CSV 생성 실패"
     assert (OUTPUT_DIR / "cross_check_points.csv").exists(), "3시점 원자료 검산표 생성 실패"
     assert (OUTPUT_DIR / "metric_cross_check.csv").exists(), "핵심 수치 검산표 생성 실패"
+    if config.source == "live":
+        assert (OUTPUT_DIR / "source_manifest.json").exists(), "공개 출처 명세 생성 실패"
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -1417,6 +1463,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--rolling-window", type=int, default=12)
     parser.add_argument("--forecast-horizon", type=int, default=3)
+    parser.add_argument(
+        "--github-url",
+        default=DEFAULT_GITHUB_URL,
+        help="REPORT.md에 보존할 공개 GitHub 저장소 URL",
+    )
+    parser.add_argument(
+        "--dashboard-url",
+        default=DEFAULT_DASHBOARD_URL,
+        help="REPORT.md에 보존할 공개 Streamlit 대시보드 URL",
+    )
     return parser.parse_args(argv)
 
 
@@ -1431,6 +1487,8 @@ def main(argv: list[str] | None = None) -> int:
         source=args.source,
         rolling_window=args.rolling_window,
         forecast_horizon=args.forecast_horizon,
+        github_url=args.github_url,
+        dashboard_url=args.dashboard_url,
     )
     if config.start >= config.end:
         raise ValueError("시작일은 종료일보다 빨라야 합니다.")

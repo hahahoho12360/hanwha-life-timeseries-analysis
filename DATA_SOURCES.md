@@ -8,7 +8,7 @@
 |---|---|---|---|---|
 | 한화생명 종가 | 088350 | 네이버 금융 자료를 FinanceDataReader로 접근 | 마지막 거래일 종가 | 수정주가·배당 반영 여부를 실행 시점 문서와 표본 대조 |
 | KOSPI | KS11 / KRX 1001 | 한국거래소 계열 자료를 FinanceDataReader로 접근 | 마지막 거래일 종가 | 제공처 점검·개편 때 일시 오류 가능 |
-| 보험업 시장 계열 | KRX 1025 우선 / KODEX 보험 140700 대체 | 내용이 있는 수동 KRX CSV 또는 pykrx 인증 수집을 우선한다. 불가능하면 삼성자산운용이 KRX 보험지수 추종 상품으로 명시한 ETF 가격을 대용변수로 쓴다. | 마지막 거래일 종가 | ETF 보수·분배금·추적오차 때문에 원지수와 같지 않다. `source_manifest.json`에서 실제 사용 계열 확인 |
+| 보험업 시장 계열 | KRX 1025 우선 / KODEX 보험 140700 대체 | 내용이 있는 수동 KRX CSV 또는 pykrx 인증 수집을 우선한다. 불가능하면 삼성자산운용이 KRX 보험지수 추종 상품으로 명시한 ETF 가격을 대용변수로 쓴다. | 마지막 거래일 종가 | ETF 보수·분배금·추적오차 때문에 원지수와 같지 않다. `outputs/source_manifest.json`에서 실제 사용 계열 확인 |
 | 한국 10년물 | FRED IRLTLT01KRM156N | OECD → FRED 공식 CSV | 월자료 그대로 사용 | %, 비계절조정, 10년 기준물 |
 | 원/달러 | FRED DEXKOUS | 미국 연준 H.10 → FRED 공식 CSV | 일별값의 월평균 | 1달러당 원화, 뉴욕 정오 매입환율 |
 | 미국 10년물 | FRED DGS10 | 미국 연준 H.15 → FRED 공식 CSV | 일별값의 월평균 | %, 10년 만기 일정만기 금리 |
@@ -18,14 +18,17 @@
 | 변수 | 코드·경로 | 처리 |
 |---|---|---|
 | 한국 실질 GDP | FRED NGDPRSAXDCKRQ, 원 출처 IMF IFS | 계절조정 실질 GDP 수준에서 전기 대비·전년 동기 대비 성장률 계산 |
-| 한화생명 영업이익 | 우선 `data/manual/hanwha_operating_profit.csv`; 비어 있으면 `NAVER/FINSTATE-2Q/088350` 자동 시도 | 분기값에서 전년 동기 대비 증가율 계산 |
+| 한화생명 영업이익 | `data/manual/hanwha_operating_profit.csv`의 DART 검증값만 사용 | 분기 단독값에서 전년 동기 대비 증가율 계산; 공식 검증 파일이 비면 보조 분석 제외 |
 
-영업이익은 보험회사의 회계표시가 일반 제조업과 다르고 2023년 IFRS 17 도입 전후 비교 가능성도 낮다. 따라서 다음 우선순위를 권장한다.
+영업이익은 보험회사의 회계표시가 일반 제조업과 다르고 2023년 IFRS 17 도입 전후 비교 가능성도 낮다. 이 프로젝트는 비공식 자동 스냅샷을 사용하지 않고 다음 원칙을 적용한다.
 
 1. 한화생명 IR의 연결 손익계산서 또는 금융감독원 공시 원문에서 분기 영업이익을 확인한다.
 2. 누적액으로 표시된 반기·3분기·연간 자료는 해당 분기 단독액과 혼동하지 않는다.
 3. `quarter`는 `2015Q1` 형식, `operating_profit_krw_100m`은 억 원 단위로 통일한다.
 4. 각 행의 `source_url`에 근거 문서 주소를 기록한다.
+5. 각 행의 `derivation`에 직접값 또는 누적액 차감식과 백만원→억원 변환을 기록한다.
+
+현재 검증 CSV는 2025Q2 2,407.04억원, 2025Q3 3,548.89억원, 2025Q4 1,802.98억원, 2026Q1 4,807.82억원, 2026Q2 6,267.82억원을 포함한다. 2025Q4는 연간 누적 1,147,250백만원에서 3분기 누적 966,952백만원을 뺀 값이고, 2026Q1은 반기 누적 1,107,564백만원에서 2분기 단독 626,782백만원을 뺀 값이다.
 
 ## 직접 확인할 링크
 
@@ -35,6 +38,9 @@
 - 삼성자산운용 KODEX 보험의 KRX 보험지수 추종 공지: https://www.samsungfund.com/etf/lounge/notice-view.do?no=76573
 - 한화생명 IR: https://www.hanwhalife.com/company/ir/main/main.do
 - 금융감독원 전자공시: https://dart.fss.or.kr/
+- DART 2025년 3분기보고서: https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251113000814
+- DART 2025년 사업보고서: https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260316001304
+- DART 2026년 반기보고서(정정): https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260831001232
 - FRED 한국 10년물: https://fred.stlouisfed.org/series/IRLTLT01KRM156N
 - FRED 원/달러: https://fred.stlouisfed.org/series/DEXKOUS
 - FRED 미국 10년물: https://fred.stlouisfed.org/series/DGS10
@@ -42,7 +48,7 @@
 
 ## 수집·정제 재현 순서
 
-1. `analysis.py --source live`가 원자료를 `data/raw`에 CSV로 저장한다.
+1. `analysis.py --source live`가 원자료를 `data/raw`에 CSV로 저장하고, 실제 사용 출처·대체경로를 `outputs/source_manifest.json`에 공개용으로 저장한다.
 2. 주가·지수는 월말 종가, 일별 금리·환율은 월평균으로 집계한다.
 3. 주가·지수·환율은 `pct_change() * 100`, 금리는 `diff()`로 바꾼다.
 4. 같은 월말 날짜로 병합하고 핵심 변수가 결측인 달만 제외한다.
@@ -50,6 +56,8 @@
 6. 처리 결과는 `data/processed/monthly_analysis.csv`와 `outputs/data_quality_profile.csv`에 기록한다.
 7. 첫 완전관측 월·2020년 3월·마지막 월을 원자료 수준값으로 다시 계산해 `outputs/cross_check_points.csv`에 기록한다.
 8. 처리 CSV의 핵심 수치를 `metrics.json` 및 `REPORT.md` 표시값과 비교해 `outputs/metric_cross_check.csv`에 기록한다.
+
+`data/raw`는 라이선스·재배포 주의를 위해 Git에서 제외되지만 `outputs/source_manifest.json`은 비밀정보 없이 저장소에 포함된다. 따라서 평가자는 원자료 파일을 재배포받지 않아도 실제 사용 계열과 접근 URL을 확인할 수 있다.
 
 ## 라이선스·인용 주의
 

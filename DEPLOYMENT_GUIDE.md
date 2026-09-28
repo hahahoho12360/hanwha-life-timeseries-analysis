@@ -11,7 +11,7 @@ python -m unittest discover -s tests -v
 python -c "import json; m=json.load(open('outputs/metrics.json', encoding='utf-8')); print(m['source_mode'], m['monthly_complete_observations'], m['period'])"
 ```
 
-정상이면 단위검사 5개가 `ok`이고, 둘째 명령은 `live`, `140`, `2015-01-31~2026-08-31`을 보여준다.
+정상이면 단위검사 7개가 `ok`이고, 둘째 명령은 `live`, `140`, `2015-01-31~2026-08-31`을 보여준다.
 
 `python analysis.py --source sample`을 다시 실행하면 실제 결과가 가상자료로 덮어써지므로 제출 직전에는 실행하지 않는다.
 
@@ -72,7 +72,7 @@ git push -u origin main
 - `analysis.py`, `dashboard.py`, `requirements.txt`, `requirements-lock.txt`
 - `README.md`, `REPORT.md`, `DATA_SOURCES.md`, `VERIFICATION.md`, `FINAL_AUDIT.md`
 - `data/processed/monthly_analysis.csv`, `data/processed/quarterly_auxiliary.csv`
-- `outputs/metrics.json`, `outputs/forecast.csv`, `outputs/cross_check_points.csv`
+- `outputs/source_manifest.json`, `outputs/metrics.json`, `outputs/forecast.csv`, `outputs/cross_check_points.csv`
 - `outputs/figures/06_baseline_forecast.png`를 포함한 PNG 7개
 
 GitHub 주소를 로그아웃 창에서 열어도 보여야 한다.
@@ -120,7 +120,7 @@ git commit -m "Add public repository and dashboard URLs"
 git push
 ```
 
-주의: 이 뒤에 `analysis.py`를 다시 실행하면 `REPORT.md`의 URL 칸이 기본 문구로 돌아간다. 다시 분석했다면 URL을 마지막에 다시 적는다.
+`analysis.py`에는 현재 공개 URL이 기본값으로 들어 있어 재실행해도 `REPORT.md`의 URL이 유지된다. 저장소나 앱 주소가 바뀐 경우에는 `--github-url`과 `--dashboard-url` 옵션으로 새 주소를 넘긴다.
 
 ## 8. 제출 직전 최종 확인
 
@@ -128,5 +128,4 @@ git push
 - Streamlit URL이 시크릿 창에서 열리고 필터가 작동한다.
 - GitHub에 `.env`가 없다.
 - `REPORT.md`가 `실제 공개자료`, 140개 관측치라고 표시한다.
-- `FINAL_AUDIT.md`의 조건부 2개 항목을 실제 URL로 바꾸어 완료 처리한다.
-
+- `FINAL_AUDIT.md`의 17개 평가문항과 두 보너스 항목이 모두 `통과`인지 확인한다.
