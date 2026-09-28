@@ -1,0 +1,12 @@
+﻿metric,recalculated_full_precision,json_value,json_absolute_difference,report_display_text,report_text_found,passed
+monthly_complete_observations,140.0,140.0,0.0,**핵심 완전관측치:** 140개,True,True
+strongest_correlation,0.747755024542215,0.747755024542215,0.0,상관계수는 **0.748**,True,True
+kr10y_up_or_flat_mean,3.241688706440109,3.241688706440109,0.0,평균수익률은 **3.24%**,True,True
+kr10y_down_mean,-2.9943185213708965,-2.9943185213708965,0.0,하락한 달은 **-2.99%**,True,True
+usdkrw_up_mean,-1.9277704138295106,-1.9277704138295106,0.0,상승(원화 약세)한 달의 평균수익률은 **-1.93%**,True,True
+usdkrw_down_mean,3.1514801852653775,3.1514801852653775,0.0,하락한 달은 **3.15%**,True,True
+counterexample_pct,15.714285714285714,15.714285714285714,0.0,전체 월의 **15.7%**,True,True
+rolling_correlation_min,0.32613149205920794,,,**0.326~0.937**,True,True
+rolling_correlation_max,0.937105656008266,,,**0.326~0.937**,True,True
+forecast_model_mae,11.554600140018303,11.554600140018303,0.0,AR(3) Ridge MAE: **11.55%p**,True,True
+forecast_baseline_mae,10.288546831610908,10.288546831610908,0.0,과거평균 베이스라인 MAE: **10.29%p**,True,True

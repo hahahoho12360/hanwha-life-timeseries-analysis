@@ -1,0 +1,29 @@
+{
+  "source_mode": "live",
+  "period": {
+    "start": "2015-01-31",
+    "end": "2026-08-31"
+  },
+  "monthly_complete_observations": 140,
+  "quarterly_rows": 46,
+  "correlations_with_hanwha": {
+    "insurance_return_pct": 0.747755024542215,
+    "kospi_return_pct": 0.48055047551312635,
+    "kr10y_change_pp": 0.07656976295208695,
+    "usdkrw_change_pct": -0.3246254818289991,
+    "us10y_change_pp": 0.09202970834427913
+  },
+  "regime_means": {
+    "kr10y_up_or_flat": 3.241688706440109,
+    "kr10y_down": -2.9943185213708965,
+    "usdkrw_up": -1.9277704138295106,
+    "usdkrw_down": 3.1514801852653775
+  },
+  "counterexample_insurance_up_hanwha_down_pct": 15.714285714285714,
+  "forecast": {
+    "holdout_months": 12.0,
+    "model_mae_pct_point": 11.554600140018303,
+    "historical_mean_baseline_mae_pct_point": 10.288546831610908,
+    "residual_std_pct_point": 9.039214989482312
+  }
+}

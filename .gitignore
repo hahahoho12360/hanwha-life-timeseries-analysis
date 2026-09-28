@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.DS_Store
+.streamlit/secrets.toml
+
+# 실행 중 다시 만들 수 있는 임시 파일
+data/raw/
+
