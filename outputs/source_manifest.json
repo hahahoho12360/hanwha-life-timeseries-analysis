@@ -1,0 +1,67 @@
+{
+  "source_mode": "live",
+  "analysis_period": {
+    "requested_start": "2015-01-01",
+    "requested_end": "2026-08-31"
+  },
+  "generated_at_utc": "2026-09-28T07:40:09+00:00",
+  "raw_data_policy": "data/raw is generated locally and excluded from Git; this public manifest contains only source metadata and no credentials.",
+  "sources": [
+    {
+      "variable": "hanwha_close",
+      "series": "한화생명 088350",
+      "access": "FinanceDataReader NAVER:088350",
+      "url": "https://finance.naver.com/item/main.naver?code=088350",
+      "raw_file": "data/raw/hanwha_daily.csv"
+    },
+    {
+      "variable": "kospi_close",
+      "series": "KOSPI",
+      "access": "FinanceDataReader KS11",
+      "url": "https://data.krx.co.kr/",
+      "raw_file": "data/raw/kospi_daily.csv"
+    },
+    {
+      "variable": "insurance_close",
+      "series": "보험업 시장 계열",
+      "access": "FinanceDataReader NAVER:140700 (KODEX 보험 ETF 대용변수)",
+      "url": "https://www.samsungfund.com/etf/lounge/notice-view.do?no=76573",
+      "raw_file": "data/raw/kospi_insurance_monthly.csv"
+    },
+    {
+      "variable": "kr10y_pct",
+      "series": "FRED IRLTLT01KRM156N",
+      "access": "FRED 공식 CSV",
+      "url": "https://fred.stlouisfed.org/series/IRLTLT01KRM156N",
+      "raw_file": "data/raw/fred_korea_10y.csv"
+    },
+    {
+      "variable": "usdkrw",
+      "series": "FRED DEXKOUS",
+      "access": "FRED 공식 CSV",
+      "url": "https://fred.stlouisfed.org/series/DEXKOUS",
+      "raw_file": "data/raw/fred_usdkrw.csv"
+    },
+    {
+      "variable": "us10y_pct",
+      "series": "FRED DGS10",
+      "access": "FRED 공식 CSV",
+      "url": "https://fred.stlouisfed.org/series/DGS10",
+      "raw_file": "data/raw/fred_us_10y.csv"
+    },
+    {
+      "variable": "real_gdp_level",
+      "series": "FRED NGDPRSAXDCKRQ",
+      "access": "FRED 공식 CSV",
+      "url": "https://fred.stlouisfed.org/series/NGDPRSAXDCKRQ",
+      "raw_file": "data/raw/fred_korea_real_gdp_quarterly.csv"
+    },
+    {
+      "variable": "operating_profit_krw_100m",
+      "series": "한화생명 분기 영업이익(보조)",
+      "access": "수동 검증 CSV(DART 연결 포괄손익계산서)",
+      "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260831001232",
+      "raw_file": "data/manual/hanwha_operating_profit.csv"
+    }
+  ]
+}
