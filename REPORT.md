@@ -183,8 +183,8 @@ AI 없이 핵심 결론을 재구성하려면 `data/raw` → `data/processed/mon
 
 ## 13. 제출 링크
 
-- GitHub 저장소 URL: `<업로드 후 실제 주소 입력>`
-- 공개 웹 대시보드 URL: `<Streamlit 배포 후 실제 주소 입력>`
+- GitHub 저장소 URL: <https://github.com/hahahoho12360/hanwha-life-timeseries-analysis>
+- 공개 웹 대시보드 URL: <https://hanwha-life-timeseries-analysis-3kcrxnzdhpt9e9e9jb8ckm.streamlit.app/>
 
-두 주소는 로그아웃 또는 시크릿 브라우저에서도 열리는지 확인한다. 이 절은 `analysis.py`를 다시
-실행하면 기본 문구로 덮어써지므로, **최종 실자료 분석을 끝낸 다음 마지막에 주소를 입력한다.**
+두 주소는 2026-09-28 공개 상태로 확인했다. 이 절은 `analysis.py`를 다시 실행하면 기본 문구로
+덮어써지므로, 분석을 다시 실행한 경우 위 실제 주소를 마지막에 다시 입력한다.

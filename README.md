@@ -264,7 +264,7 @@ streamlit run dashboard.py
 
 ## 11. GitHub에 올리기
 
-GitHub에서 `hanwha-life-timeseries-analysis`라는 **Public** 저장소를 빈 상태로 만든 뒤, 프로젝트 터미널에서 아래를 한 줄씩 실행한다. `<본인아이디>`만 바꾼다.
+공개 저장소는 <https://github.com/hahahoho12360/hanwha-life-timeseries-analysis>에 배포되어 있다. 같은 프로젝트를 새 계정에 다시 올릴 때는 아래 명령에서 계정명만 바꾼다.
 
 ```powershell
 git init
@@ -272,7 +272,7 @@ git add .
 git status
 git commit -m "Add Hanwha Life monthly time-series analysis"
 git branch -M main
-git remote add origin https://github.com/<본인아이디>/hanwha-life-timeseries-analysis.git
+git remote add origin https://github.com/hahahoho12360/hanwha-life-timeseries-analysis.git
 git push -u origin main
 ```
 
@@ -290,17 +290,17 @@ GitHub 화면에서 다음이 실제로 보이는지 확인한다.
 
 1. <https://share.streamlit.io/>에 GitHub 계정으로 로그인한다.
 2. `Create app` 또는 `New app`을 누른다.
-3. Repository에 `<본인아이디>/hanwha-life-timeseries-analysis`를 고른다.
+3. Repository에 `hahahoho12360/hanwha-life-timeseries-analysis`를 고른다.
 4. Branch는 `main`을 고른다.
 5. Main file path에는 `dashboard.py`를 적는다.
 6. `Deploy`를 누르고 설치가 끝날 때까지 기다린다.
-7. 열린 주소가 예를 들어 `https://본인앱이름.streamlit.app`처럼 보이면 복사한다.
+7. 배포된 주소는 <https://hanwha-life-timeseries-analysis-3kcrxnzdhpt9e9e9jb8ckm.streamlit.app/>이다.
 8. 시크릿 브라우저에서 주소를 열어 그래프가 보이는지 확인한다.
-9. 아래 두 곳의 `<배포 후 입력>`을 실제 주소로 바꾸고 다시 커밋·푸시한다.
+9. 아래 두 주소를 README와 REPORT에 동일하게 기록하고 다시 커밋·푸시한다.
 
 ```text
-README 공개 대시보드 URL: <배포 후 입력>
-REPORT 공개 대시보드 URL: <배포 후 입력>
+README 공개 대시보드 URL: https://hanwha-life-timeseries-analysis-3kcrxnzdhpt9e9e9jb8ckm.streamlit.app/
+REPORT 공개 대시보드 URL: https://hanwha-life-timeseries-analysis-3kcrxnzdhpt9e9e9jb8ckm.streamlit.app/
 ```
 
 수정 후 업로드:
@@ -370,8 +370,8 @@ tests/test_analysis.py              자동검사
    - `data/processed/monthly_analysis.csv`
 
 5. **제출 링크 2개**
-   - GitHub 저장소 URL 1개: `https://github.com/<본인아이디>/hanwha-life-timeseries-analysis`
-   - **실제로 접속되는 웹 대시보드 URL 1개**: `https://<본인앱이름>.streamlit.app`
+   - GitHub 저장소 URL 1개: <https://github.com/hahahoho12360/hanwha-life-timeseries-analysis>
+   - **실제로 접속되는 웹 대시보드 URL 1개**: <https://hanwha-life-timeseries-analysis-3kcrxnzdhpt9e9e9jb8ckm.streamlit.app/>
 
 6. **보너스 두 가지 모두**
    - **웹 대시보드**: 기간·조건을 사용자가 바꾸고 공개 URL로 접속 가능
@@ -379,14 +379,14 @@ tests/test_analysis.py              자동검사
 
 ## **최종 제출 전 30초 확인**
 
-- [ ] `REPORT.md` 첫 부분이 실자료라고 표시되고 ‘연습용 가상자료’ 경고가 없다.
-- [ ] 월별 완전 관측치가 100개 이상이다.
-- [ ] 그래프가 3개 이상 열리고 숫자가 서로 모순되지 않는다.
-- [ ] `REPORT.md`의 숫자 3개를 CSV나 `metrics.json`으로 직접 다시 계산했다.
-- [ ] GitHub URL이 로그아웃 상태에서도 열린다.
-- [ ] Streamlit URL이 시크릿 창에서도 열리고 조건 변경이 된다.
-- [ ] `.env`, KRX 아이디·비밀번호, 개인 API 키가 GitHub에 없다.
-- [ ] 표와 문장에 ‘원인’이라고 단정하지 않고 ‘동행·상관·가능성’으로 썼다.
+- [x] `REPORT.md` 첫 부분이 실자료라고 표시되고 ‘연습용 가상자료’ 경고가 없다.
+- [x] 월별 완전 관측치가 100개 이상이다.
+- [x] 그래프가 3개 이상 열리고 숫자가 서로 모순되지 않는다.
+- [x] `REPORT.md`의 숫자 3개를 CSV나 `metrics.json`으로 직접 다시 계산했다.
+- [x] GitHub 공개 URL에서 저장소와 29개 파일을 확인했다.
+- [x] Streamlit 공개 URL에서 140개 관측치·필터·그래프·예측·CSV 다운로드 영역을 확인했다.
+- [x] `.env`, KRX 아이디·비밀번호, 개인 API 키가 GitHub에 없다.
+- [x] 표와 문장에 ‘원인’이라고 단정하지 않고 ‘동행·상관·가능성’으로 썼다.
 
 ---
 
@@ -481,7 +481,7 @@ python -m pip install -r requirements.txt
 
 ## 18. 제출 URL 기록란
 
-- GitHub 저장소 URL: `<업로드 후 입력>`
-- 공개 대시보드 URL: `<배포 후 입력>`
+- GitHub 저장소 URL: <https://github.com/hahahoho12360/hanwha-life-timeseries-analysis>
+- 공개 대시보드 URL: <https://hanwha-life-timeseries-analysis-3kcrxnzdhpt9e9e9jb8ckm.streamlit.app/>
 
 두 주소를 입력한 뒤 `REPORT.md`에도 똑같이 기록하고 마지막 커밋을 한다.

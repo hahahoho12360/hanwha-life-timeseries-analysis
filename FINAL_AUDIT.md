@@ -14,8 +14,8 @@
 | 시각화 | PNG 7개 | 통과 |
 | 예측 | AR(3) Ridge 3개월 및 근사 구간 | 통과 |
 | 로컬 대시보드 | Streamlit AppTest 예외 0건, 지표 카드 4개, Plotly 그래프 5개 | 통과 |
-| 공개 GitHub URL | 계정 소유자가 업로드 후 입력 | 조건부 |
-| 공개 Streamlit URL | 계정 소유자가 배포 후 입력 | 조건부 |
+| 공개 GitHub URL | <https://github.com/hahahoho12360/hanwha-life-timeseries-analysis>; 공개 파일 29개 확인 | 통과 |
+| 공개 Streamlit URL | <https://hanwha-life-timeseries-analysis-3kcrxnzdhpt9e9e9jb8ckm.streamlit.app/>; 140개 관측치·필터·그래프·예측 화면 확인 | 통과 |
 
 ## 2. 최종 결과물 점검
 
@@ -25,7 +25,7 @@
 | 시각화 2개 이상, 권장 총 3개 이상 | `outputs/figures/` PNG 7개, REPORT 링크 정상 | 통과 |
 | 원본 데이터 또는 수집 스크립트 | `analysis.py`, 처리 CSV, `DATA_SOURCES.md`, 원자료 manifest | 통과 |
 | Jupyter 또는 Python 코드 | `analysis.py`, `dashboard.py` Python 스크립트 | 통과 |
-| GitHub 저장소 | 업로드 절차는 `DEPLOYMENT_GUIDE.md`; 실제 공개 URL 필요 | 조건부 |
+| GitHub 저장소 | 공개 저장소에 코드·보고서·처리자료·그래프 등 29개 파일 게시 | 통과 |
 
 ## 3. 기능 요구 사항 전체 점검
 
@@ -41,7 +41,7 @@
 
 | 보너스 | 실제 구현 | 상태 |
 |---|---|---|
-| 분석 결과 서비스화 | 기간·변수·금리/환율 조건을 바꿀 수 있는 `dashboard.py`; AppTest 예외 0건 | 로컬 통과, 공개 URL은 조건부 |
+| 분석 결과 서비스화 | 기간·변수·금리/환율 조건을 바꿀 수 있는 공개 Streamlit 앱; AppTest 예외 0건 | 통과 |
 | 시계열 심화 (B) 간단 예측 | AR(3) Ridge, 시간순 12개월 검증, 과거평균 MAE 비교, 3개월 예측, 가정·한계 | 통과 |
 
 예측 검증에서 모델 MAE는 약 11.55%p, 과거평균 기준선은 약 10.29%p다. 모델이 약 1.27%p 더 나쁘므로 ‘예측 성공’으로 포장하지 않고 기준선을 개선하지 못했다고 보고한다.
@@ -70,7 +70,7 @@
 | 4 | 필수 시각화 2개 이상인가 | PNG 7개 | 통과 |
 | 5 | 권장 시각화까지 총 3개 이상인가 | PNG 7개 | 통과 |
 | 6 | 인사이트 3개 이상에 수치/구간 근거가 있는가 | REPORT 인사이트 4개 | 통과 |
-| 7 | GitHub에 코드·리포트·실행/출처가 있는가 | 파일 준비 완료, 공개 저장소 업로드 후 URL 확인 필요 | 조건부 |
+| 7 | GitHub에 코드·리포트·실행/출처가 있는가 | 공개 저장소의 `analysis.py`, `dashboard.py`, REPORT·README·DATA_SOURCES 및 산출물 확인 | 통과 |
 | 8 | 로딩→정제→분석→시각화 흐름을 설명하는가 | README 0장, 함수별 구조 | 통과 |
 | 9 | 결측·이상치 기준과 이유를 설명하는가 | REPORT 3절, 품질 CSV | 통과 |
 | 10 | 집계 단위와 선택 이유를 설명하는가 | 월말/월평균과 월 단위 이유 | 통과 |
@@ -82,7 +82,7 @@
 | 16 | 한계와 다음 수집·검증 데이터를 제안하는가 | REPORT 9절: CSM·K-ICS·수급·공시 등 | 통과 |
 | 17 | AI 없이 핵심 결론을 재구성할 수 있는가 | raw→processed→metrics→figures 경로와 수식 | 통과 |
 
-현재 판정은 **내용·코드·로컬 산출물 16개 문항 통과, 외부 공개가 필요한 7번만 조건부**다. GitHub와 Streamlit을 실제 배포하고 두 URL을 시크릿 창에서 확인하면 전체 제출 상태가 된다.
+현재 판정은 **17개 평가문항 전체 통과**다. GitHub 공개 저장소와 Streamlit 공개 대시보드가 실제 배포되었고, 두 보너스 과제(서비스화·간단 예측)도 모두 포함됐다.
 
 ## 7. 자료 대체와 해석상의 주의
 
