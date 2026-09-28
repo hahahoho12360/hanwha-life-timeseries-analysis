@@ -1,2 +1,6 @@
-quarter,operating_profit_krw_100m,source_url
-
+quarter,operating_profit_krw_100m,source_url,derivation
+2025Q2,2407.04,https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260831001232,DART 2026 H1 comparative 2025 3-month operating profit 240704 million KRW divided by 100
+2025Q3,3548.89,https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251113000814,DART 2025 Q3 3-month operating profit 354889 million KRW divided by 100
+2025Q4,1802.98,https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260316001304,DART 2025 annual 1147250 minus Q3 cumulative 966952 million KRW then divided by 100
+2026Q1,4807.82,https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260831001232,DART 2026 H1 cumulative 1107564 minus Q2 626782 million KRW then divided by 100
+2026Q2,6267.82,https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260831001232,DART 2026 H1 3-month operating profit 626782 million KRW divided by 100
