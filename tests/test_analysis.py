@@ -63,6 +63,36 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(result.index.max(), pd.Timestamp("2025-12-31"))
         self.assertNotIn(999, result.tolist())
 
+    def test_default_public_urls_survive_report_regeneration(self):
+        args = analysis.parse_args([])
+        self.assertEqual(args.github_url, analysis.DEFAULT_GITHUB_URL)
+        self.assertEqual(args.dashboard_url, analysis.DEFAULT_DASHBOARD_URL)
+
+    def test_public_source_manifest_is_written_without_raw_files(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            raw_dir = root / "raw"
+            output_dir = root / "outputs"
+            raw_dir.mkdir()
+            output_dir.mkdir()
+            sources = [
+                {
+                    "variable": "example",
+                    "series": "official example",
+                    "access": "official CSV",
+                    "url": "https://example.com/data",
+                    "raw_file": "data/raw/example.csv",
+                }
+            ]
+            with (
+                patch.object(analysis, "RAW_DIR", raw_dir),
+                patch.object(analysis, "OUTPUT_DIR", output_dir),
+            ):
+                analysis.write_source_manifests(sources, self.config)
+            public_text = (output_dir / "source_manifest.json").read_text(encoding="utf-8")
+            self.assertIn('"source_mode": "sample"', public_text)
+            self.assertIn('"variable": "example"', public_text)
+
 
 if __name__ == "__main__":
     unittest.main()
